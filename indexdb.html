@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic IndexedDB Collections</title>
+  </head>
+
+  <body>
+    <form id="collectionForm">
+      <label for="collectionName">Enter Collection Name:</label>
+      <input type="text" id="collectionName" name="collectionName" required />
+      <button type="submit">Create Collection</button>
+    </form>
+    <!-- 
+    <script>
+      document.getElementById("collectionForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        let collectionName = document.getElementById("collectionName").value.trim();
+
+        if (!collectionName) {
+          alert("Collection name is required.");
+          return;
+        }
+
+        let dbName = "MyDynamicDatabase";
+
+        // 获取当前版本号
+        let versionRequest = indexedDB.open(dbName);
+
+        versionRequest.onsuccess = function (event) {
+          let db = event.target.result;
+          let currentVersion = db.version;
+          db.close();
+
+          // 升级数据库并创建新的对象存储
+          upgradeDatabase(dbName, currentVersion + 1, collectionName);
+        };
+
+        versionRequest.onerror = function (event) {
+          console.error("Database error: " + event.target.errorCode);
+        };
+      });
+
+      function upgradeDatabase(dbName, newVersion, collectionName) {
+        let request = indexedDB.open(dbName, newVersion);
+
+        request.onupgradeneeded = function (event) {
+          let db = event.target.result;
+
+          if (!db.objectStoreNames.contains(collectionName)) {
+            let objectStore = db.createObjectStore(collectionName, { keyPath: "id", autoIncrement: true });
+            console.log(`Object store ${collectionName} created in version ${newVersion}.`);
+          } else {
+            console.log(`Object store ${collectionName} already exists.`);
+          }
+        };
+
+        request.onsuccess = function (event) {
+          let db = event.target.result;
+          console.log("Database upgraded and opened successfully");
+        };
+
+        request.onerror = function (event) {
+          console.error("Database error: " + event.target.errorCode);
+        };
+      }
+
+      // 0-------------------
+
+      function createDateBase(dbName) {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(dbName);
+
+          request.onsuccess = function (event) {
+            let db = event.target.result;
+            let currentVersion = db.version;
+            db.close();
+            resolve(db);
+          };
+
+          request.onerror = function (event) {
+            console.error("Database error: " + event.target.errorCode);
+            reject(event.target.errorCode);
+          };
+        });
+      }
+
+      function createCollection2(db, collectionName) {
+        return new Promise((resolve, reject) => {
+          // 参数验证
+          if (!db || typeof collectionName !== "string") return reject(new Error("Invalid arguments"));
+          const { name, version } = db;
+          // const newVersion = !isUpgrade ? version : version + 1
+          const request = indexedDB.open(name, version + 1);
+
+          request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+
+            if (!db.objectStoreNames.contains(collectionName)) {
+              let objectStore = db.createObjectStore(collectionName, { keyPath: "id", autoIncrement: true });
+              console.log(`Object store ${collectionName} created in version ${version}.`);
+            } else {
+              console.log(`Object store ${collectionName} already exists.`);
+            }
+          };
+
+          request.onsuccess = (event) => {
+            console.log("Database upgraded and opened successfully");
+            resolve(event.target.result);
+          };
+
+          request.onerror = (event) => {
+            console.error("Database error: " + event.target.errorCode);
+            reject(event.target.errorCode);
+          };
+        });
+      }
+
+      function addItem(db, storeName, item) {
+        const transaction = db.transaction([storeName], "readwrite");
+        const objectStore = transaction.objectStore(storeName);
+        const request = objectStore.add(item);
+
+        request.onsuccess = () => {
+          console.log("Item added to the store:", storeName);
+        };
+
+        request.onerror = (event) => {
+          console.error("Add item error: ", event.target.errorCode);
+        };
+      }
+
+      const a = async () => {
+        try {
+          const db = await createDateBase("a");
+          console.log(db);
+          const { name, version, objectStoreNames } = db;
+          // const result = await createCollection2(db, "test1");
+          // addItem(result, "test1", { id: CreatingUniversallyUniqueIdentifier(), name: 'xiaoming0' })
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      a();
+      /**
+       * @description 创建通用唯一识别码
+       *  */
+      function CreatingUniversallyUniqueIdentifier() {
+        // 获取当前时间的毫秒数，并转换为16进制字符串，取前8位
+        const timeComponent = Date.now().toString(16).slice(-8);
+
+        // 生成一个8位的随机数
+        const randomComponent = Math.random().toString(16).substr(2, 8);
+
+        const uuid = "UUID" + timeComponent + randomComponent;
+        return uuid;
+      }
+    </script> -->
+
+    <script src="./indexdb.js"></script>
+  </body>
+</html>

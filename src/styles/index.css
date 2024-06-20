@@ -1,0 +1,103 @@
+:root {
+    /* 中文字体样式 */
+    --app-font-family-CN: SF Pro SC, SF Pro Display, SF Pro Icons, PingFang SC, Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+html,
+body,
+#root,
+header,
+nav,
+main,
+section,
+article,
+aside,
+footer,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+div,
+p,
+strong,
+ul,
+ol,
+li,
+span,
+a,
+form,
+input,
+label {
+    margin: 0;
+    padding: 0;
+}
+
+/* Dark Mode */
+body[theme-mode="dark"] {
+    --app-theme: #212121;
+    --app-text-color: #c2c2c3;
+    --app-sidesheet-color: rgb(35, 36, 41, 0.6);
+    --app-hover-color: #124cd5cf;
+}
+
+/* Light Mode */
+body[theme-mode="light"] {
+    --app-theme: #ffffff;
+    --app-text-color: #1d1d1f;
+    --app-sidesheet-color: #f9f9f9;
+    --app-hover-color: #ececec;
+    --app-scrollbar-thumb-color: #cdcdcd;
+
+}
+
+html,
+body,
+#root {
+    min-height: 100vh;
+}
+
+#root {
+    display: flex;
+}
+
+/* IE/Edge 滚动条 */
+html {
+    overflow: -moz-hidden-unscrollable;
+}
+
+/* Chorme */
+body::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #535bf2;
+    border-radius: 3px;
+}
+
+
+body {
+    font-family: SF Pro SC, SF Pro Display, SF Pro Icons, PingFang SC, Helvetica Neue, Helvetica, Arial, sans-serif;
+    /* font-size: 0.18rem; */
+    font-size: 16px;
+    line-height: 1.47059;
+    font-weight: 400;
+    color: var(--app-text-color);
+    background: var(--app-theme);
+    transition: 0.5s;
+    text-rendering: optimizeLegibility;
+    /* 调整字体渲染方式 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
+}
+
+
+a {
+    text-decoration: none;
+    color: var(--app-text-color);
+}

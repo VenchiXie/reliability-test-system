@@ -1,0 +1,23 @@
+.setup-content {
+    width: 180px;
+    user-select: none;
+}
+
+.setup-content>article {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 550;
+    line-height: 36px;
+    height: 36px;
+    padding: 0 8px;
+    margin: 8px auto;
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-color: transparent;
+    transition: background-color 0.5s;
+}
+
+.setup-content>article:hover {
+    background-color: var(--app-hover-color);
+}
