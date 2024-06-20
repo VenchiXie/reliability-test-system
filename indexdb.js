@@ -36,33 +36,27 @@ class DB {
   #createDatebase() {
     return new Promise((resolve, reject) => {
       if (!this.databaseName || !this.collections) {
-        throw new Error("请添加数据库名称或集合！");
+        return reject(new Error("请添加数据库名称或集合！"));
       }
 
       if (typeof this.databaseName !== "string" || this.databaseName.trim() === "") {
-        throw new Error(`"${this.databaseName}" 是非法字符，请使用数字、字符、下划线'_' 进行组合。`);
+        return reject(new Error(`"${this.databaseName}" 是非法字符，请使用数字、字符、下划线'_' 进行组合。`));
       }
 
       const request = indexedDB.open(this.databaseName);
 
       request.onupgradeneeded = (event) => {
-        console.log("eeeeee", event.target.transaction);
-        this.#createObjectStores(event.target.result, this.collections);
+        this.#createObjectStores(event.target.result, this.collections, event.target.transaction);
       };
 
       request.onsuccess = (event) => {
-        // 出现多个集合时，数据库进行升级。
-        // Array.isArray(this.collections)
-        //   ? this.#checkAndUpgrade(event.target.result, this.collections).then(resolve).catch(reject)
-        //   : resolve(event.target.result);
-
-        const db = event.target.result;
-
-        this.#checkAndUpgrade(db, this.collections)
+        this.#checkAndUpgrade(event.target.result, this.collections)
           .then(() => {
+            resolve();
             console.log(`Database "${this.databaseName}" initialized successfully`);
           })
           .catch((error) => {
+            reject(error);
             console.error("Database upgrade error: " + error);
           });
       };
@@ -80,7 +74,7 @@ class DB {
    * @param {Array|Object} collections - 集合配置
    * @returns {Promise<IDBDatabase>} - 返回一个 Promise 对象
    */
-  #createObjectStores(db, collections) {
+  #createObjectStores(db, collections, transaction) {
     if (
       !collections ||
       (Array.isArray(collections) && collections.length === 0) ||
@@ -102,18 +96,14 @@ class DB {
       }
 
       let objectStore;
+      // 排除已创建的store name
       if (!db.objectStoreNames.contains(name)) {
-
-        const transaction = db.transaction([this.collections.name], "readwrite").objectStore(this.collections.name);
-        console.log(transaction);
-
         objectStore = db.createObjectStore(name, { keyPath: "_id", autoIncrement });
         objectStore.createIndex("_id", "_id", { unique: true }); // default create indexs _id
         console.log(`Object store ${name} created in version ${db.version}.`);
       } else {
-
-
-        objectStore = event.target.transaction.objectStore(name); // access existing object store
+        // objectStore = event.target.transaction.objectStore(name); // access existing object store
+        objectStore = transaction.objectStore(name);
         console.log(`Object store ${name} opened for update in version ${db.version}.`);
       }
       this.#createIndexes(objectStore, indexs); // create indexs
@@ -155,28 +145,39 @@ class DB {
    */
   #checkAndUpgrade(db, collections) {
     return new Promise((resolve, reject) => {
-      let isUpgrade = false;
-
-      [].concat(collections).forEach(({ name, indexs }) => {
+      // let isUpgrade = false;
+      // [].concat(collections).forEach(({ name, indexs }) => {
+      //   // 排除相同的集合名
+      //   if (!db.objectStoreNames.contains(name)) {
+      //     isUpgrade = true;
+      //   } else {
+      //     const objectStore = db.transaction([name], "readonly").objectStore(name);
+      //     if (indexs) {
+      //       const indexArray = Array.isArray(indexs) ? indexs : [indexs];
+      //       indexArray.forEach(({ name }) => {
+      //         if (!objectStore.indexNames.contains(name)) isUpgrade = true;
+      //       });
+      //     }
+      //   }
+      // });
+      const isUpgrade = [].concat(collections).some(({ name, indexs }) => {
         // 排除相同的集合名
         if (!db.objectStoreNames.contains(name)) {
-          isUpgrade = true;
-        } else {
+          return true;
+        } else if (indexs) {
+          // store 有 index 的情况下进行升级
           const objectStore = db.transaction([name], "readonly").objectStore(name);
-          if (indexs) {
-            const indexArray = Array.isArray(indexs) ? indexs : [indexs];
-            indexArray.forEach(({ name }) => {
-              if (!objectStore.indexNames.contains(name)) isUpgrade = true;
-            });
-          }
+          const indexArray = Array.isArray(indexs) ? indexs : [indexs];
+          return indexArray.some(({ name }) => !objectStore.indexNames.contains(name));
         }
+        return false;
       });
 
       if (isUpgrade) {
         db.close();
         const upgradeRequest = indexedDB.open(this.databaseName, db.version + 1);
         upgradeRequest.onupgradeneeded = (event) => {
-          this.#createObjectStores(event.target.result, collections);
+          this.#createObjectStores(event.target.result, collections, event.target.transaction);
         };
 
         upgradeRequest.onsuccess = (event) => {
@@ -217,9 +218,25 @@ const a = async () => {
       },
       {
         name: "col3",
+        indexs: [
+          { name: "age", unique: false },
+          { name: "name", unique: true },
+          { name: "abc", unique: false },
+        ],
       },
       {
         name: "col4",
+
+        indexs: [
+          { name: "name", unique: true },
+
+          { name: "age", unique: false },
+          { name: "abc", unique: false },
+        ],
+      },
+      {
+        name: "col5",
+        indexs: { name: "name", unique: true },
       },
     ]);
   } catch (error) {
