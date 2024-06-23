@@ -17,15 +17,16 @@ function App() {
   const handleToggleSidesheet = () => {
     const currentWindowWidth = document.documentElement.clientWidth; // 移动端
     if (currentWindowWidth <= 750) {
+      document.body.classList.toggle("active-overflow");
       appSideRef.current.classList.toggle("active-mobile");
       appMainRef.current.classList.add("active");
-      appSide_FixedMenuRef.current.children[0].classList.remove("active");
+      // appSide_FixedMenuRef.current.children[0].classList.remove("active");
     } else {
       // pc端
       appSideRef.current.classList.toggle("active-pc");
       appMainRef.current.classList.toggle("active");
-      appSide_FixedMenuRef.current.classList.toggle("active-pc");
-      appSide_FixedMenuRef.current.children[0].classList.toggle("active");
+      // appSide_FixedMenuRef.current.classList.toggle("active-pc");
+      // appSide_FixedMenuRef.current.children[0].classList.toggle("active");
     }
   };
 
@@ -35,13 +36,13 @@ function App() {
       if (currentWindowWidth <= 750) {
         appSideRef.current.classList.remove("active-pc");
         appSideRef.current.classList.add("active-mobile");
-        appSide_FixedMenuRef.current.classList.remove("active-pc");
+        // appSide_FixedMenuRef.current.classList.remove("active-pc");
         appSide_MobileMenuRef.current.classList.add("active");
         appMainRef.current.classList.add("active");
       } else {
         appSideRef.current.classList.remove("active-pc");
         appSideRef.current.classList.remove("active-mobile");
-        appSide_FixedMenuRef.current.classList.remove("active-pc");
+        // appSide_FixedMenuRef.current.classList.remove("active-pc");
         appSide_MobileMenuRef.current.classList.remove("active");
         appMainRef.current.classList.remove("active");
       }
@@ -179,12 +180,7 @@ function App() {
         <section className="app-aside-mask" onClick={handleToggleSidesheet}></section>
         <section className="app-aside-menu">
           <article className="app-aside-menu-1" ref={appSide_FixedMenuRef}>
-            <div className="app-aside-menu-1-item app-aside-side-button" onClick={handleToggleSidesheet}>
-              &#9776;
-            </div>
-            <div className="app-aside-menu-1-item app-aside-create-button" onClick={handleCreateCreatebase}>
-              &#9997;
-            </div>
+            search box
           </article>
           <article className="app-aside-menu-2" ref={appSide_MenuItemRef}>
             {databases.map((item) => (
@@ -219,27 +215,17 @@ function App() {
       <main className="app-main" ref={appMainRef}>
         {/* main nav */}
         <nav className="app-main-nav">
-          <section className="app-aside-mobile-menu" onClick={handleToggleSidesheet} ref={appSide_MobileMenuRef}>
-            <article></article>
+          <section className="app-aside-action-menu" onClick={handleToggleSidesheet} ref={appSide_MobileMenuRef}>
             <article></article>
           </section>
-          <AppPopover
-            content={
-              <section className="app-main-nav-setup-content">
-                <article>我的</article>
-                <article>帮忙与常见问题</article>
-                <article onClick={openModal}>设置</article>
-              </section>
-            }
-            modal="bottom-left-fixed"
-            trigger="click">
-            <section className="app-main-nav-setup"></section>
-          </AppPopover>
+          <section className="app-aside-action-work">&#9924;</section>
         </nav>
 
         {/* function table component */}
         <nav ref={functionTableRef} className={`app-function-table ${functionTableVisible ? "active" : ""}`}>
-          <article className={`app-function-table-icon ${functionTableVisible ? "active" : ""}`} onClick={handleFunctionTable}>
+          <article
+            className={`app-function-table-icon ${functionTableVisible ? "active" : ""}`}
+            onClick={handleFunctionTable}>
             &#9711;
           </article>
           <article className={`app-function-table-content ${functionTableVisible ? "active" : ""}`}>
@@ -264,7 +250,10 @@ function App() {
         <section className="setup-modal">
           <article className="setup-modal-left">
             {setupItems.map((item, index) => (
-              <div key={item.id} onClick={() => handleActiveSetupItems(item.id, index)} ref={(el) => (activeSetupItemRefs.current[item.id] = el)}>
+              <div
+                key={item.id}
+                onClick={() => handleActiveSetupItems(item.id, index)}
+                ref={(el) => (activeSetupItemRefs.current[item.id] = el)}>
                 {item.name}
               </div>
             ))}
@@ -287,7 +276,9 @@ const GeneralSetUpComponent = ({}) => {
     { id: 3, name: "至夜", theme: "dark" },
   ]);
 
-  const [activeTheme, setActiveTheme] = useState(() => JSON.parse(localStorage.getItem("theme")) || { id: 1, name: "系统", theme: "system" });
+  const [activeTheme, setActiveTheme] = useState(
+    () => JSON.parse(localStorage.getItem("theme")) || { id: 1, name: "系统", theme: "system" }
+  );
   const activeThemeRefs = useRef([]);
 
   const handleActiveTheme = (id) => {
@@ -322,7 +313,10 @@ const GeneralSetUpComponent = ({}) => {
           content={
             <article className="setup-modal-right-theme-content">
               {themes.map((item) => (
-                <div key={item.id} onClick={() => handleActiveTheme(item.id)} ref={(el) => (activeThemeRefs.current[item.id] = el)}>
+                <div
+                  key={item.id}
+                  onClick={() => handleActiveTheme(item.id)}
+                  ref={(el) => (activeThemeRefs.current[item.id] = el)}>
                   {item.name}
                 </div>
               ))}
